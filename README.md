@@ -15,7 +15,7 @@
 <h3 align="center">utility</h3>
 
   <p align="center">
-    A header-only utility parser and generator for C++17. It supports both SAX and DOM style API.
+    A versatile utility library for C++17.
     <br/>
     <a href="https://me.hauhau.cn/projects/utility/"><strong>Explore the docs »</strong></a>
     <br/>
