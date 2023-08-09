@@ -36,4 +36,4 @@
 ## Features
 
 - **File and Memory Mapping**. This feature provides functionality for handling file and memory mapping operations. It allows for efficient processing of large files by offering memory mapping (mmap) and memory locking (mlock) capabilities. These features are particularly useful in specific environments such as big data processing and high-performance computing.
-- **Flexible Logging System**. Flexible Logging System: Implement a straightforward logging system that allows formatted log messages to be generated across different levels of importance.
+- **Flexible Logging System**. Implement a straightforward logging system that allows formatted log messages to be generated across different levels of importance.
