@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.0)
+set( utility_SOURCE_DIR "@CONFIG_SOURCE_DIR@")
+set( utility_DIR "@CONFIG_DIR@")
+get_filename_component(utility_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+set( utility_INCLUDE_DIR  "@utility_INCLUDE_DIR@" )
+set( utility_INCLUDE_DIRS  "@utility_INCLUDE_DIR@" )
+message(STATUS "utility found. Headers: ${utility_INCLUDE_DIRS}")
+
+if(NOT TARGET utility)
+    add_library(utility INTERFACE IMPORTED)
+    set_property(TARGET utility PROPERTY
+            INTERFACE_INCLUDE_DIRECTORIES ${utility_INCLUDE_DIRS})
+endif()

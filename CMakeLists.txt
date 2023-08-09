@@ -122,3 +122,82 @@ endif ()
 
 add_subdirectory(src)
 add_subdirectory(example)
+
+#add extra search paths for libraries and includes
+SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
+SET(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "Directory where lib will install")
+
+# header
+install(DIRECTORY include/utility
+        DESTINATION "${INCLUDE_INSTALL_DIR}"
+        COMPONENT dev)
+
+# cmake
+if (UNIX OR CYGWIN)
+    set(_CMAKE_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
+elseif (WIN32)
+    set(_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
+endif ()
+set(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
+
+export(PACKAGE ${PROJECT_NAME})
+
+set(CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include")
+
+configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        @ONLY)
+configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        @ONLY)
+
+set(CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME})
+file(RELATIVE_PATH REL_INCLUDE_DIR
+        "${CMAKECONFIG_INSTALL_DIR}"
+        "${CMAKE_INSTALL_PREFIX}/include")
+set(${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+set(CONFIG_SOURCE_DIR)
+set(CONFIG_DIR)
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        @ONLY)
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+
+if (CMAKE_INSTALL_DIR)
+    install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+            DESTINATION "${CMAKE_INSTALL_DIR}"
+            COMPONENT dev)
+endif ()
+
+# pkg-config
+IF (UNIX OR CYGWIN)
+    CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+            @ONLY)
+    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+            DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
+            COMPONENT pkgconfig)
+ENDIF ()
+
+# uninstall target
+if (NOT TARGET uninstall)
+    configure_file(
+            "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}Uninstall.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Uninstall.cmake"
+            IMMEDIATE @ONLY)
+    add_custom_target(uninstall
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Uninstall.cmake)
+endif ()
+
+message("The directory the headers are installed in: ${CMAKE_INSTALL_PREFIX}")
+message("Directory where lib will install: ${LIB_INSTALL_DIR}")
+message("")
