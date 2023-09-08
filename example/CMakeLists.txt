@@ -5,6 +5,8 @@ if (POLICY CMP0054)
 endif ()
 
 set(EXAMPLES
+        des
+        des_test
         filesystem
 )
 
