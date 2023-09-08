@@ -168,22 +168,21 @@ struct MLock {
 
   bool raw_lock(const void *ptr, size_t len) {
     if (!::mlock(ptr, len)) { return true; }
-    else {
-      char *errmsg = strerror(errno);
-      bool suggest = (errno == ENOMEM);
 
-      rlimit lock_limit{};
-      if (suggest && getrlimit(RLIMIT_MEMLOCK, &lock_limit)) { suggest = false; }
-      if (suggest && (lock_limit.rlim_max > lock_limit.rlim_cur + len)) { suggest = false; }
+    char *errmsg = strerror(errno);
+    bool suggest = (errno == ENOMEM);
 
-      WARN("failed to mlock %zu-byte buffer (after previously locking %zu bytes): %s\n%s",
-           len,
-           size,
-           errmsg,
-           suggest ? MLOCK_SUGGESTION : "");
+    rlimit lock_limit{};
+    if (suggest && getrlimit(RLIMIT_MEMLOCK, &lock_limit)) { suggest = false; }
+    if (suggest && (lock_limit.rlim_max > lock_limit.rlim_cur + len)) { suggest = false; }
 
-      return false;
-    }
+    WARN("failed to mlock %zu-byte buffer (after previously locking %zu bytes): %s\n%s",
+         len,
+         size,
+         errmsg,
+         suggest ? MLOCK_SUGGESTION : "");
+
+    return false;
   }
 
 #undef MLOCK_SUGGESTION
